@@ -1,10 +1,10 @@
 FROM steamcmd/steamcmd:debian-12
 
 USER root
-RUN apt-get update && apt-get install -y \
-    libgcc-s1 \
-    gosu \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libgcc-s1 gosu && rm -rf /var/lib/apt/lists/*
+
+# steam 유저 생성
+RUN groupadd -g 1000 steam && useradd -m -u 1000 -g 1000 steam
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
