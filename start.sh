@@ -46,15 +46,17 @@ log_info "서버 파일 확인 중..."
 OLD_VER=""
 [ -f "${VERSION_FILE}" ] && OLD_VER=$(cat "${VERSION_FILE}")
 
-steamcmd +force_install_dir "${INSTALL_DIR}" \
-    +login anonymous \
-    +app_update 2394010 validate \
-    +quit 2>&1 | \
-    if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
-        cat
-    else
-        grep -v '^\[.*%\]\|^$\|Verifying\|Downloading\|Extracting\|Installing\|Cleaning'
-    fi || true
+if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
+    steamcmd +force_install_dir "${INSTALL_DIR}" \
+        +login anonymous \
+        +app_update 2394010 validate \
+        +quit
+else
+    steamcmd +force_install_dir "${INSTALL_DIR}" \
+        +login anonymous \
+        +app_update 2394010 validate \
+        +quit 2>&1 | grep -E "^Error|^Failed|fully installed|up to date" || true
+fi
 
 NEW_VER=$(grep "buildid" "${INSTALL_DIR}/steamapps/appmanifest_2394010.acf" 2>/dev/null \
     | awk -F'"' '{print $4}')
