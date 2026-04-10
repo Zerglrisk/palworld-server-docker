@@ -47,12 +47,12 @@ OLD_VER=""
 [ -f "${VERSION_FILE}" ] && OLD_VER=$(cat "${VERSION_FILE}")
 
 if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
-    steamcmd +force_install_dir "${INSTALL_DIR}" \
+    steamcmd +force_install_dir /home/steam/serverfiles \
         +login anonymous \
         +app_update 2394010 validate \
         +quit
 else
-    steamcmd +force_install_dir "${INSTALL_DIR}" \
+    steamcmd +force_install_dir /home/steam/serverfiles \
         +login anonymous \
         +app_update 2394010 validate \
         +quit 2>&1 | grep -E "^Error|^Failed|fully installed|up to date" || true
