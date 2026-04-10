@@ -46,8 +46,8 @@ log_info "서버 파일 확인 중..."
 OLD_VER=""
 [ -f "${VERSION_FILE}" ] && OLD_VER=$(cat "${VERSION_FILE}")
 
-steamcmd +login anonymous \
-    +force_install_dir "${INSTALL_DIR}" \
+steamcmd +force_install_dir "${INSTALL_DIR}" \
+    +login anonymous \
     +app_update 2394010 validate \
     +quit 2>&1 | \
     if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
@@ -96,7 +96,7 @@ apply "ServerPlayerMaxNum"   ${MAX_PLAYERS:-32}
 apply "PublicPort"           ${PORT:-8211}
 apply "PublicIP"             "\"${PUBLIC_IP:-}\""
 apply "bAllowClientMod"      ${ALLOW_CLIENT_MOD:-False}
-apply "CrossplayPlatforms"   "(${CROSSPLAY_PLATFORMS:-Steam,Xbox,PS5,Mac})"
+sed -i "s|CrossplayPlatforms=([^)]*)[^,)]*|CrossplayPlatforms=(${CROSSPLAY_PLATFORMS:-Steam,Xbox,PS5,Mac})|g" "${CONFIG_FILE}"
 
 # 게임플레이 배율
 apply "DayTimeSpeedRate"          ${DAY_TIME_SPEED_RATE:-1.000000}
@@ -131,7 +131,7 @@ apply "PalStaminaDecreaceRate"     ${PAL_STAMINA_DECREASE_RATE:-1.000000}
 apply "PalAutoHPRegeneRate"        ${PAL_AUTO_HP_REGEN_RATE:-1.000000}
 
 # REST API / RCON
-apply "RESTAPIEnabled"  ${REST_API_ENABLED:-True}
+apply "RESTAPIEnabled"  ${REST_API_ENABLED:-False}
 apply "RESTAPIPort"     ${REST_API_PORT:-8212}
 apply "RCONEnabled"     ${RCON_ENABLED:-False}
 apply "RCONPort"        ${RCON_PORT:-25575}
@@ -153,7 +153,13 @@ if [ "${COMMUNITY:-false}" = "true" ]; then
     log_warn "커뮤니티 서버 모드 활성화 — 서버 목록에 공개됩니다"
 fi
 
-log_info "서버 시작 중 (포트: ${PORT:-8211}, 쿼리: ${QUERY_PORT:-27015}, REST API: ${REST_API_PORT:-8212})"
+if [ "${REST_API_ENABLED:-false}" = "true"  ]; then
+    log_info "서버 시작 중 (포트: ${PORT:-8211}, 쿼리: ${QUERY_PORT:-27015}, REST API: ${REST_API_PORT:-8212})"
+else
+	log_info "서버 시작 중 (포트: ${PORT:-8211}, 쿼리: ${QUERY_PORT:-27015})"
+fi
+
+
 echo ""
 
 cd "${INSTALL_DIR}"
