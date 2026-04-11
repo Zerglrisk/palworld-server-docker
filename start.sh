@@ -117,6 +117,8 @@ apply "bEnableFriendlyFire"       ${ENABLE_FRIENDLY_FIRE:-False}
 apply "bEnablePlayerToPlayerDamage" ${ENABLE_PLAYER_TO_PLAYER_DAMAGE:-False}
 apply "PalEggDefaultHatchingTime"  ${PAL_EGG_DEFAULT_HATCHING_TIME:-72.000000}
 apply "GuildPlayerMaxNum"         ${GUILD_PLAYER_MAX_NUM:-20}
+apply "BaseCampMaxNum"             ${BASE_CAMP_MAX_NUM:-128}
+apply "BaseCampWorkerMaxNum"       ${BASE_CAMP_WORKER_MAX_NUM:-15}
 
 # 데미지/밸런스 배율
 apply "PalDamageRateAttack"        ${PAL_DAMAGE_RATE_ATTACK:-1.000000}
