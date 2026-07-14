@@ -46,6 +46,15 @@ log_info "서버 파일 확인 중..."
 OLD_VER=""
 [ -f "${VERSION_FILE}" ] && OLD_VER=$(cat "${VERSION_FILE}")
 
+# Steam 업데이트 캐시 복구 모드
+if [ "${STEAM_REPAIR:-false}" = "true" ]; then
+    log_warn "Steam repair mode enabled. Cleaning update cache..."
+    rm -f /home/steam/serverfiles/steamapps/appmanifest_2728330.acf
+    rm -rf /home/steam/serverfiles/steamapps/downloading/*
+    rm -rf /home/steam/serverfiles/steamapps/temp/*
+    log_info "Steam cache cleaned."
+fi
+
 if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
     steamcmd +force_install_dir /home/steam/serverfiles \
         +login anonymous \
