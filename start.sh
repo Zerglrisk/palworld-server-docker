@@ -46,26 +46,61 @@ log_info "서버 파일 확인 중..."
 OLD_VER=""
 [ -f "${VERSION_FILE}" ] && OLD_VER=$(cat "${VERSION_FILE}")
 
-# Steam 업데이트 캐시 복구 모드
-if [ "${STEAM_REPAIR:-false}" = "true" ]; then
-    log_warn "Steam repair mode enabled. Cleaning update cache..."
-    rm -f /home/steam/serverfiles/steamapps/appmanifest_2394010.acf
-    rm -rf /home/steam/serverfiles/steamapps/downloading/*
-    rm -rf /home/steam/serverfiles/steamapps/temp/*
+repair_steam() {
+    log_warn "Cleaning Steam update cache..."
+
+    rm -f "${INSTALL_DIR}/steamapps/appmanifest_2394010.acf"
+    rm -rf "${INSTALL_DIR}/steamapps/downloading/"*
+    rm -rf "${INSTALL_DIR}/steamapps/temp/"*
+
     log_info "Steam cache cleaned."
+}
+
+update_steam() {
+    if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
+        steamcmd +force_install_dir "${INSTALL_DIR}" \
+            +login anonymous \
+            +app_update 2394010 validate \
+            +quit
+    else
+        steamcmd +force_install_dir "${INSTALL_DIR}" \
+            +login anonymous \
+            +app_update 2394010 validate \
+            +quit 2>&1 | grep -E "^Error|^Failed|fully installed|up to date" || true
+    fi
+}
+
+if ! update_steam; then
+    log_warn "Steam update failed. Attempting automatic repair..."
+
+    repair_steam
+
+    if ! update_steam; then
+        log_error "Steam update failed after automatic repair."
+        exit 1
+    fi
 fi
 
-if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
-    steamcmd +force_install_dir /home/steam/serverfiles \
-        +login anonymous \
-        +app_update 2394010 validate \
-        +quit
-else
-    steamcmd +force_install_dir /home/steam/serverfiles \
-        +login anonymous \
-        +app_update 2394010 validate \
-        +quit 2>&1 | grep -E "^Error|^Failed|fully installed|up to date" || true
-fi
+# Steam 업데이트 캐시 복구 모드
+# if [ "${STEAM_REPAIR:-false}" = "true" ]; then
+#     log_warn "Steam repair mode enabled. Cleaning update cache..."
+#     rm -f /home/steam/serverfiles/steamapps/appmanifest_2394010.acf
+#     rm -rf /home/steam/serverfiles/steamapps/downloading/*
+#     rm -rf /home/steam/serverfiles/steamapps/temp/*
+#     log_info "Steam cache cleaned."
+# fi
+
+# if [ "${STEAMCMD_DEBUG:-false}" = "true" ]; then
+#     steamcmd +force_install_dir /home/steam/serverfiles \
+#         +login anonymous \
+#         +app_update 2394010 validate \
+#         +quit
+# else
+#     steamcmd +force_install_dir /home/steam/serverfiles \
+#         +login anonymous \
+#         +app_update 2394010 validate \
+#         +quit 2>&1 | grep -E "^Error|^Failed|fully installed|up to date" || true
+# fi
 
 NEW_VER=$(grep "buildid" "${INSTALL_DIR}/steamapps/appmanifest_2394010.acf" 2>/dev/null \
     | awk -F'"' '{print $4}')
