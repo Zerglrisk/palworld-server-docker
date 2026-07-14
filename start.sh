@@ -49,7 +49,7 @@ OLD_VER=""
 # Steam 업데이트 캐시 복구 모드
 if [ "${STEAM_REPAIR:-false}" = "true" ]; then
     log_warn "Steam repair mode enabled. Cleaning update cache..."
-    rm -f /home/steam/serverfiles/steamapps/appmanifest_2728330.acf
+    rm -f /home/steam/serverfiles/steamapps/appmanifest_2394010.acf
     rm -rf /home/steam/serverfiles/steamapps/downloading/*
     rm -rf /home/steam/serverfiles/steamapps/temp/*
     log_info "Steam cache cleaned."
